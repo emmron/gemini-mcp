@@ -1,0 +1,17 @@
+{
+  "name": "gemini-mcp",
+  "version": "1.0.0",
+  "description": "Simple Gemini MCP for Claude Code",
+  "type": "module",
+  "main": "src/server.js",
+  "bin": {
+    "gemini-mcp": "src/server.js"
+  },
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "openai": "^4.67.0"
+  }
+}

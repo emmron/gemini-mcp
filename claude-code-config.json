@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "gemini": {
+      "command": "node",
+      "args": ["/home/emmet/geminimcp/src/server.js"],
+      "env": {
+        "OPENROUTER_API_KEY": "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"
+      }
+    }
+  }
+}

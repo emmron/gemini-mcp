@@ -1,0 +1,11 @@
+[
+  {
+    "id": "mc4wj98h60ha1rw6pqw",
+    "title": "Test Task",
+    "description": "This is a test task to verify MCP functionality",
+    "priority": "medium",
+    "status": "pending",
+    "createdAt": "2025-06-20T14:25:08.993Z",
+    "updatedAt": "2025-06-20T14:25:08.993Z"
+  }
+]
