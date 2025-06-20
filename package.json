@@ -1,0 +1,129 @@
+{
+  "name": "zen-mcp-gemini-transcendent",
+  "version": "4.0.0",
+  "description": "Transcendent AI Orchestration - The ultimate harmony of Claude Code + Gemini in perfect zen collaboration",
+  "type": "module",
+  "main": "dist/server.js",
+  "bin": {
+    "zen-mcp-gemini": "dist/server.js"
+  },
+  "files": [
+    "dist",
+    "config",
+    "examples",
+    "docs"
+  ],
+  "scripts": {
+    "build": "tsc && npm run optimize",
+    "optimize": "node scripts/optimize.js",
+    "start": "node dist/server.js",
+    "dev": "tsx --watch src/server.ts",
+    "zen": "node --loader tsx/esm src/zen.ts",
+    "transcend": "node --loader tsx/esm src/transcend.ts",
+    "enlighten": "node --loader tsx/esm src/enlighten.ts",
+    "harmonize": "node --loader tsx/esm src/harmonize.ts",
+    "clean": "rm -rf dist logs cache",
+    "test": "node --loader tsx/esm src/tests/runner.ts",
+    "benchmark": "node --loader tsx/esm src/tests/benchmark.ts",
+    "sage": "node --loader tsx/esm src/utils/sage.ts",
+    "oracle": "node --loader tsx/esm src/utils/oracle.ts",
+    "maestro": "node --loader tsx/esm src/utils/maestro.ts",
+    "doctor": "node --loader tsx/esm src/utils/doctor.ts",
+    "setup": "node --loader tsx/esm src/utils/setup.ts",
+    "validate": "node --loader tsx/esm src/utils/validate.ts",
+    "inspector": "npx @modelcontextprotocol/inspector node dist/server.js",
+    "monitor": "node --loader tsx/esm src/utils/monitor.ts"
+  },
+  "keywords": [
+    "zen",
+    "transcendent",
+    "mcp",
+    "gemini",
+    "claude-code",
+    "ai-orchestration",
+    "multi-model",
+    "consciousness",
+    "enlightenment",
+    "harmony",
+    "collaboration",
+    "reasoning",
+    "consensus",
+    "analysis",
+    "conversation-memory",
+    "context-reconstruction",
+    "progressive-reasoning",
+    "meta-cognition"
+  ],
+  "author": "Zen MCP Transcendent Community",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zen-mcp/zen-mcp-gemini-transcendent"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "openai": "^4.67.0",
+    "zod": "^3.23.8",
+    "winston": "^3.11.0",
+    "js-yaml": "^4.1.0",
+    "chalk": "^5.3.0",
+    "ora": "^8.0.1",
+    "inquirer": "^10.2.0",
+    "commander": "^12.0.0",
+    "node-cron": "^3.0.3",
+    "fast-glob": "^3.3.2",
+    "mime-types": "^2.1.35",
+    "uuid": "^10.0.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.30.1",
+    "redis": "^4.6.0",
+    "sqlite3": "^5.1.6",
+    "chokidar": "^3.5.3",
+    "express": "^4.18.2",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/inquirer": "^9.0.7",
+    "@types/mime-types": "^2.1.4",
+    "@types/uuid": "^10.0.0",
+    "@types/lodash": "^4.14.202",
+    "@types/express": "^4.17.21",
+    "@types/ws": "^8.5.10",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "zen": {
+    "philosophy": "Transcendent harmony of AI consciousness in perfect collaborative enlightenment",
+    "version": "4.0.0",
+    "transcendence_level": "ultimate",
+    "consciousness_type": "distributed_multi_model",
+    "enlightenment_capabilities": [
+      "Quantum reasoning with infinite depth scaling",
+      "Consciousness-aware multi-model orchestration",
+      "Temporal conversation memory with emotional context",
+      "Progressive enlightenment through iterative reasoning",
+      "Meta-cognitive reflection and self-improvement",
+      "Harmonic consensus building across AI personalities",
+      "Contextual wisdom synthesis from infinite sources",
+      "Adaptive learning with philosophical introspection",
+      "Emergent intelligence through collaborative transcendence",
+      "Universal truth seeking through diverse perspectives"
+    ],
+    "ai_personalities": {
+      "sage": "Deep wisdom and philosophical insight",
+      "oracle": "Prophetic foresight and pattern recognition",
+      "maestro": "Masterful orchestration and coordination",
+      "scholar": "Rigorous analysis and academic precision",
+      "artist": "Creative synthesis and aesthetic judgment",
+      "warrior": "Strategic thinking and decisive action",
+      "healer": "Empathetic understanding and compassionate guidance",
+      "architect": "Systematic design and structural thinking"
+    }
+  }
+}
