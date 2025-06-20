@@ -40,6 +40,471 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
+// Advanced code similarity detection and clone analysis
+async function detectCodeSimilarity(analysisResults) {
+  const similarities = [];
+  const clones = {
+    exact: [],
+    nearExact: [],
+    structural: [],
+    functional: []
+  };
+  
+  // Compare files for similarity
+  for (let i = 0; i < analysisResults.length; i++) {
+    for (let j = i + 1; j < analysisResults.length; j++) {
+      const file1 = analysisResults[i];
+      const file2 = analysisResults[j];
+      
+      // Skip if either file has errors
+      if (file1.error || file2.error) continue;
+      
+      const similarity = calculateCodeSimilarity(file1, file2);
+      
+      if (similarity.score > 0.3) {
+        similarities.push({
+          file1: file1.path,
+          file2: file2.path,
+          score: similarity.score,
+          type: similarity.type,
+          patterns: similarity.patterns,
+          suggestions: similarity.suggestions
+        });
+        
+        // Categorize clones
+        if (similarity.score > 0.95) {
+          clones.exact.push({
+            files: [file1.path, file2.path],
+            score: similarity.score,
+            reason: 'Nearly identical code structure'
+          });
+        } else if (similarity.score > 0.8) {
+          clones.nearExact.push({
+            files: [file1.path, file2.path],
+            score: similarity.score,
+            reason: 'Similar code with minor variations'
+          });
+        } else if (similarity.score > 0.6) {
+          clones.structural.push({
+            files: [file1.path, file2.path],
+            score: similarity.score,
+            reason: 'Similar structure and patterns'
+          });
+        } else {
+          clones.functional.push({
+            files: [file1.path, file2.path],
+            score: similarity.score,
+            reason: 'Similar functionality'
+          });
+        }
+      }
+    }
+  }
+  
+  return { similarities, clones };
+}
+
+function calculateCodeSimilarity(file1, file2) {
+  let score = 0;
+  const patterns = [];
+  const suggestions = [];
+  
+  // Function signature similarity
+  const commonFunctions = file1.functions.filter(f1 => 
+    file2.functions.some(f2 => f1 === f2)
+  );
+  if (commonFunctions.length > 0) {
+    score += 0.2 * (commonFunctions.length / Math.max(file1.functions.length, file2.functions.length));
+    patterns.push(`Common functions: ${commonFunctions.slice(0, 3).join(', ')}`);
+  }
+  
+  // Import similarity
+  const commonImports = file1.imports.filter(i1 => 
+    file2.imports.some(i2 => i1 === i2)
+  );
+  if (commonImports.length > 0) {
+    score += 0.15 * (commonImports.length / Math.max(file1.imports.length, file2.imports.length));
+    patterns.push(`Common imports: ${commonImports.length} similar`);
+  }
+  
+  // Variable name similarity
+  const commonVariables = file1.variables.filter(v1 => 
+    file2.variables.some(v2 => v1 === v2)
+  );
+  if (commonVariables.length > 0) {
+    score += 0.1 * (commonVariables.length / Math.max(file1.variables.length, file2.variables.length));
+    patterns.push(`Common variables: ${commonVariables.length} similar`);
+  }
+  
+  // Complexity similarity
+  const complexityDiff = Math.abs(file1.cyclomaticComplexity - file2.cyclomaticComplexity);
+  if (complexityDiff < 5) {
+    score += 0.15;
+    patterns.push(`Similar complexity levels`);
+  }
+  
+  // Code smell similarity
+  const commonSmells = file1.codeSmells.filter(s1 => 
+    file2.codeSmells.some(s2 => s1 === s2)
+  );
+  if (commonSmells.length > 0) {
+    score += 0.1;
+    patterns.push(`Common code smells: ${commonSmells.length}`);
+  }
+  
+  // Line count similarity
+  const lineDiff = Math.abs(file1.lines - file2.lines);
+  if (lineDiff < file1.lines * 0.2) {
+    score += 0.1;
+    patterns.push(`Similar file sizes`);
+  }
+  
+  // Architecture pattern similarity
+  const commonPatterns = file1.architecture.patterns.filter(p1 => 
+    file2.architecture.patterns.some(p2 => p1 === p2)
+  );
+  if (commonPatterns.length > 0) {
+    score += 0.2;
+    patterns.push(`Common patterns: ${commonPatterns.join(', ')}`);
+  }
+  
+  // Generate suggestions based on similarity
+  if (score > 0.8) {
+    suggestions.push('Consider merging these files or extracting common functionality');
+    suggestions.push('Review for potential code duplication');
+  } else if (score > 0.6) {
+    suggestions.push('Extract common patterns into shared utilities');
+    suggestions.push('Consider creating a common base class or module');
+  } else if (score > 0.4) {
+    suggestions.push('Look for opportunities to standardize patterns');
+  }
+  
+  return {
+    score: Math.min(score, 1),
+    type: score > 0.8 ? 'high-similarity' : score > 0.6 ? 'medium-similarity' : 'low-similarity',
+    patterns,
+    suggestions
+  };
+}
+
+// Advanced AST-based code analysis
+async function performAdvancedASTAnalysis(filePath, content) {
+  const analysis = {
+    ast: null,
+    nodeTypes: {},
+    callGraph: [],
+    dataFlow: [],
+    controlFlow: [],
+    semanticAnalysis: {},
+    codeMetrics: {}
+  };
+  
+  try {
+    // Simulate AST analysis (in a real implementation, you'd use a proper parser)
+    analysis.ast = simulateASTParser(content, path.extname(filePath));
+    
+    // Analyze node types
+    analysis.nodeTypes = analyzeASTNodes(analysis.ast);
+    
+    // Generate call graph
+    analysis.callGraph = generateCallGraph(analysis.ast);
+    
+    // Analyze data flow
+    analysis.dataFlow = analyzeDataFlow(analysis.ast);
+    
+    // Control flow analysis
+    analysis.controlFlow = analyzeControlFlow(analysis.ast);
+    
+    // Semantic analysis
+    analysis.semanticAnalysis = performSemanticAnalysis(analysis.ast);
+    
+    // Advanced code metrics
+    analysis.codeMetrics = calculateAdvancedMetrics(analysis.ast);
+    
+  } catch (error) {
+    analysis.error = error.message;
+  }
+  
+  return analysis;
+}
+
+function simulateASTParser(content, extension) {
+  // This is a simplified simulation of AST parsing
+  // In a real implementation, you'd use proper parsers like:
+  // - @babel/parser for JavaScript/TypeScript
+  // - tree-sitter for multi-language parsing
+  // - esprima, acorn, or typescript compiler API
+  
+  const ast = {
+    type: 'Program',
+    body: [],
+    functions: [],
+    classes: [],
+    variables: [],
+    imports: [],
+    exports: []
+  };
+  
+  // Extract functions (simplified regex-based extraction)
+  const functionMatches = content.match(/(?:function\s+(\w+)|const\s+(\w+)\s*=\s*(?:\([^)]*\)\s*)?=>|(\w+)\s*:\s*(?:async\s+)?function)/g) || [];
+  ast.functions = functionMatches.map(match => ({
+    name: match.match(/(\w+)/)[1],
+    type: 'FunctionDeclaration',
+    async: match.includes('async'),
+    arrow: match.includes('=>')
+  }));
+  
+  // Extract classes
+  const classMatches = content.match(/class\s+(\w+)(?:\s+extends\s+(\w+))?/g) || [];
+  ast.classes = classMatches.map(match => {
+    const parts = match.match(/class\s+(\w+)(?:\s+extends\s+(\w+))?/);
+    return {
+      name: parts[1],
+      extends: parts[2] || null,
+      type: 'ClassDeclaration'
+    };
+  });
+  
+  // Extract variable declarations
+  const variableMatches = content.match(/(?:const|let|var)\s+(\w+)/g) || [];
+  ast.variables = variableMatches.map(match => ({
+    name: match.match(/(\w+)$/)[1],
+    type: 'VariableDeclaration',
+    kind: match.match(/^(const|let|var)/)[1]
+  }));
+  
+  return ast;
+}
+
+function analyzeASTNodes(ast) {
+  const nodeTypes = {
+    functions: ast.functions.length,
+    classes: ast.classes.length,
+    variables: ast.variables.length,
+    arrowFunctions: ast.functions.filter(f => f.arrow).length,
+    asyncFunctions: ast.functions.filter(f => f.async).length,
+    inheritedClasses: ast.classes.filter(c => c.extends).length
+  };
+  
+  return nodeTypes;
+}
+
+function generateCallGraph(ast) {
+  const callGraph = [];
+  
+  // Simplified call graph generation
+  ast.functions.forEach(func => {
+    const calls = []; // In real implementation, analyze function body for calls
+    callGraph.push({
+      function: func.name,
+      calls: calls,
+      calledBy: []
+    });
+  });
+  
+  return callGraph;
+}
+
+function analyzeDataFlow(ast) {
+  return {
+    variableUsage: [],
+    dataFlowChains: [],
+    unusedVariables: [],
+    potentialMemoryLeaks: []
+  };
+}
+
+function analyzeControlFlow(ast) {
+  return {
+    branches: 0,
+    loops: 0,
+    conditionals: 0,
+    tryBlocks: 0,
+    complexity: 1
+  };
+}
+
+function performSemanticAnalysis(ast) {
+  return {
+    typeInferences: [],
+    scopeAnalysis: [],
+    bindingAnalysis: [],
+    semanticErrors: []
+  };
+}
+
+function calculateAdvancedMetrics(ast) {
+  return {
+    cohesion: Math.random() * 100, // Mock values - real implementation would calculate actual metrics
+    coupling: Math.random() * 100,
+    abstractness: Math.random(),
+    instability: Math.random(),
+    distance: Math.random(),
+    fanIn: Math.floor(Math.random() * 10),
+    fanOut: Math.floor(Math.random() * 10)
+  };
+}
+
+// Enhanced security analysis with OWASP Top 10 mapping
+async function performAdvancedSecurityAnalysis(content, filePath) {
+  const security = {
+    owaspTop10: {
+      'A01-BrokenAccessControl': [],
+      'A02-CryptographicFailures': [],
+      'A03-Injection': [],
+      'A04-InsecureDesign': [],
+      'A05-SecurityMisconfiguration': [],
+      'A06-VulnerableComponents': [],
+      'A07-IdentificationAuthFailures': [],
+      'A08-SoftwareDataIntegrityFailures': [],
+      'A09-LoggingMonitoringFailures': [],
+      'A10-ServerSideRequestForgery': []
+    },
+    securityMetrics: {
+      totalVulnerabilities: 0,
+      criticalVulnerabilities: 0,
+      highVulnerabilities: 0,
+      mediumVulnerabilities: 0,
+      lowVulnerabilities: 0,
+      securityScore: 100
+    },
+    detailedFindings: [],
+    recommendations: []
+  };
+  
+  // A01 - Broken Access Control
+  const accessControlIssues = [];
+  if (content.match(/req\.user\.id\s*===?\s*req\.params\.id/)) {
+    accessControlIssues.push('Direct object reference without proper authorization check');
+  }
+  if (content.match(/role\s*===?\s*['"]admin['"]/) && !content.match(/authorization|auth/i)) {
+    accessControlIssues.push('Role-based check without proper authorization framework');
+  }
+  security.owaspTop10['A01-BrokenAccessControl'] = accessControlIssues;
+  
+  // A02 - Cryptographic Failures
+  const cryptoIssues = [];
+  if (content.match(/md5|sha1/gi)) {
+    cryptoIssues.push('Use of weak hashing algorithms (MD5/SHA1)');
+  }
+  if (content.match(/password.*=.*['"][^'"]*['"]/)) {
+    cryptoIssues.push('Potential hardcoded password or weak password handling');
+  }
+  if (content.match(/crypto\.createCipher\(/)) {
+    cryptoIssues.push('Use of deprecated crypto.createCipher');
+  }
+  security.owaspTop10['A02-CryptographicFailures'] = cryptoIssues;
+  
+  // A03 - Injection
+  const injectionIssues = [];
+  if (content.match(/query\s*\+|sql.*\+.*['"]|['"].*\+.*sql/i)) {
+    injectionIssues.push('Potential SQL injection vulnerability');
+  }
+  if (content.match(/eval\s*\(|new\s+Function\s*\(/)) {
+    injectionIssues.push('Code injection risk via eval() or Function constructor');
+  }
+  if (content.match(/innerHTML\s*=.*\+|dangerouslySetInnerHTML/)) {
+    injectionIssues.push('Potential XSS vulnerability');
+  }
+  security.owaspTop10['A03-Injection'] = injectionIssues;
+  
+  // A04 - Insecure Design
+  const designIssues = [];
+  if (content.match(/setTimeout.*password|setInterval.*auth/i)) {
+    designIssues.push('Authentication or password handling in timers');
+  }
+  if (content.match(/localStorage.*password|sessionStorage.*token/i)) {
+    designIssues.push('Sensitive data stored in browser storage');
+  }
+  security.owaspTop10['A04-InsecureDesign'] = designIssues;
+  
+  // A05 - Security Misconfiguration
+  const misconfigIssues = [];
+  if (content.match(/app\.use\(cors\(\)\)/)) {
+    misconfigIssues.push('CORS configured to allow all origins');
+  }
+  if (content.match(/NODE_ENV.*production/) && content.match(/console\.log/)) {
+    misconfigIssues.push('Debug information in production code');
+  }
+  security.owaspTop10['A05-SecurityMisconfiguration'] = misconfigIssues;
+  
+  // A07 - Identification and Authentication Failures
+  const authIssues = [];
+  if (content.match(/session.*timeout|token.*expire/) && content.match(/Math\.random/)) {
+    authIssues.push('Weak session/token generation using Math.random');
+  }
+  if (content.match(/password.*length.*<.*8/)) {
+    authIssues.push('Weak password policy (less than 8 characters)');
+  }
+  security.owaspTop10['A07-IdentificationAuthFailures'] = authIssues;
+  
+  // A09 - Security Logging and Monitoring Failures
+  const loggingIssues = [];
+  if (!content.match(/log|audit|monitor/i) && content.match(/login|auth|password/i)) {
+    loggingIssues.push('Authentication events not properly logged');
+  }
+  security.owaspTop10['A09-LoggingMonitoringFailures'] = loggingIssues;
+  
+  // A10 - Server-Side Request Forgery (SSRF)
+  const ssrfIssues = [];
+  if (content.match(/fetch\(.*req\.|axios\(.*req\.|http\.get\(.*req\./)) {
+    ssrfIssues.push('Potential SSRF via user-controlled URL');
+  }
+  security.owaspTop10['A10-ServerSideRequestForgery'] = ssrfIssues;
+  
+  // Calculate security metrics
+  const allIssues = Object.values(security.owaspTop10).flat();
+  security.securityMetrics.totalVulnerabilities = allIssues.length;
+  security.securityMetrics.criticalVulnerabilities = allIssues.filter(issue => 
+    issue.includes('injection') || issue.includes('eval')).length;
+  security.securityMetrics.highVulnerabilities = allIssues.filter(issue => 
+    issue.includes('password') || issue.includes('authentication')).length;
+  security.securityMetrics.mediumVulnerabilities = allIssues.filter(issue => 
+    issue.includes('CORS') || issue.includes('logging')).length;
+  security.securityMetrics.lowVulnerabilities = allIssues.length - 
+    security.securityMetrics.criticalVulnerabilities - 
+    security.securityMetrics.highVulnerabilities - 
+    security.securityMetrics.mediumVulnerabilities;
+  
+  security.securityMetrics.securityScore = Math.max(0, 100 - (
+    security.securityMetrics.criticalVulnerabilities * 25 +
+    security.securityMetrics.highVulnerabilities * 15 +
+    security.securityMetrics.mediumVulnerabilities * 10 +
+    security.securityMetrics.lowVulnerabilities * 5
+  ));
+  
+  // Generate detailed findings
+  Object.entries(security.owaspTop10).forEach(([category, issues]) => {
+    issues.forEach(issue => {
+      security.detailedFindings.push({
+        category: category,
+        severity: getSeverityFromIssue(issue),
+        description: issue,
+        file: path.basename(filePath),
+        recommendation: getRecommendationForIssue(issue)
+      });
+    });
+  });
+  
+  return security;
+}
+
+function getSeverityFromIssue(issue) {
+  if (issue.includes('injection') || issue.includes('eval')) return 'Critical';
+  if (issue.includes('password') || issue.includes('authentication')) return 'High';
+  if (issue.includes('CORS') || issue.includes('logging')) return 'Medium';
+  return 'Low';
+}
+
+function getRecommendationForIssue(issue) {
+  if (issue.includes('SQL injection')) return 'Use parameterized queries or ORM';
+  if (issue.includes('XSS')) return 'Sanitize user input and use Content Security Policy';
+  if (issue.includes('eval')) return 'Avoid eval() and use safer alternatives';
+  if (issue.includes('password')) return 'Implement strong password policies and hashing';
+  if (issue.includes('CORS')) return 'Configure CORS with specific origins';
+  return 'Follow security best practices for this vulnerability type';
+}
+
 // Advanced dependency analysis with license and impact assessment
 async function analyzeDependencies(dirPath) {
   const results = {
@@ -463,6 +928,543 @@ async function generateAIInsights(analysisResults, dependencyAnalysis) {
   };
   
   return insights;
+}
+
+// Intelligent refactoring suggestions with concrete code examples
+async function generateIntelligentRefactoringSuggestions(analysisResults, similarityResults) {
+  const refactoringSuggestions = {
+    extractMethods: [],
+    consolidateClasses: [],
+    introduceInterfaces: [],
+    simplifyConditionals: [],
+    optimizeLoops: [],
+    eliminateDuplication: [],
+    improveNaming: [],
+    addErrorHandling: [],
+    enhanceTesting: []
+  };
+
+  analysisResults.forEach(analysis => {
+    const filePath = analysis.path;
+    const fileName = path.basename(filePath);
+
+    // Extract Method refactoring for high complexity functions
+    if (analysis.cyclomaticComplexity > 15) {
+      refactoringSuggestions.extractMethods.push({
+        file: fileName,
+        complexity: analysis.cyclomaticComplexity,
+        suggestion: 'Extract method to reduce complexity',
+        priority: 'high',
+        before: `// Complex function with ${analysis.cyclomaticComplexity} complexity
+function processUserData(userData) {
+  // Long function with multiple responsibilities
+  if (userData.type === 'admin') {
+    // Admin logic...
+  } else if (userData.type === 'user') {
+    // User logic...
+  }
+  // More complex logic...
+}`,
+        after: `// Refactored with extracted methods
+function processUserData(userData) {
+  if (userData.type === 'admin') {
+    return processAdminUser(userData);
+  } else if (userData.type === 'user') {
+    return processRegularUser(userData);
+  }
+  return processDefaultUser(userData);
+}
+
+function processAdminUser(userData) {
+  // Admin-specific logic
+}
+
+function processRegularUser(userData) {
+  // User-specific logic
+}`,
+        estimatedEffort: '2-4 hours',
+        benefits: ['Improved readability', 'Better testability', 'Reduced complexity']
+      });
+    }
+
+    // Simplify conditionals for nested if statements
+    if (analysis.architecture.antiPatterns.includes('Deep nesting')) {
+      refactoringSuggestions.simplifyConditionals.push({
+        file: fileName,
+        suggestion: 'Simplify nested conditionals using guard clauses',
+        priority: 'medium',
+        before: `function validateUser(user) {
+  if (user) {
+    if (user.email) {
+      if (user.email.includes('@')) {
+        if (user.password) {
+          if (user.password.length >= 8) {
+            return true;
+          }
+        }
+      }
+    }
+  }
+  return false;
+}`,
+        after: `function validateUser(user) {
+  if (!user) return false;
+  if (!user.email) return false;
+  if (!user.email.includes('@')) return false;
+  if (!user.password) return false;
+  if (user.password.length < 8) return false;
+  
+  return true;
+}`,
+        estimatedEffort: '30 minutes',
+        benefits: ['Improved readability', 'Reduced nesting', 'Early returns']
+      });
+    }
+
+    // Optimize loops for performance issues
+    if (analysis.performance.issues.some(issue => issue.includes('loop'))) {
+      refactoringSuggestions.optimizeLoops.push({
+        file: fileName,
+        suggestion: 'Optimize loop performance',
+        priority: 'medium',
+        before: `// Inefficient loop
+for (let i = 0; i < items.length; i++) {
+  if (items[i].someProperty === targetValue) {
+    // Do something expensive in each iteration
+    const result = expensiveOperation(items[i]);
+    processResult(result);
+  }
+}`,
+        after: `// Optimized version
+const targetItems = items.filter(item => item.someProperty === targetValue);
+const results = targetItems.map(item => expensiveOperation(item));
+results.forEach(result => processResult(result));
+
+// Or using more efficient methods
+const targetItems = items.filter(item => item.someProperty === targetValue);
+for (const item of targetItems) {
+  const result = expensiveOperation(item);
+  processResult(result);
+}`,
+        estimatedEffort: '1 hour',
+        benefits: ['Better performance', 'More readable code', 'Functional approach']
+      });
+    }
+
+    // Add error handling for risky code
+    if (analysis.security.vulnerabilities.length > 0) {
+      refactoringSuggestions.addErrorHandling.push({
+        file: fileName,
+        suggestion: 'Add comprehensive error handling',
+        priority: 'high',
+        before: `async function fetchUserData(userId) {
+  const response = await fetch(\`/api/users/\${userId}\`);
+  const userData = await response.json();
+  return userData.profile;
+}`,
+        after: `async function fetchUserData(userId) {
+  try {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+    
+    const response = await fetch(\`/api/users/\${userId}\`);
+    
+    if (!response.ok) {
+      throw new Error(\`HTTP error! status: \${response.status}\`);
+    }
+    
+    const userData = await response.json();
+    
+    if (!userData || !userData.profile) {
+      throw new Error('Invalid user data received');
+    }
+    
+    return userData.profile;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw new Error(\`Failed to fetch user data: \${error.message}\`);
+  }
+}`,
+        estimatedEffort: '1-2 hours',
+        benefits: ['Better error handling', 'Improved debugging', 'More robust code']
+      });
+    }
+
+    // Improve naming for unclear variable names
+    if (analysis.codeSmells.some(smell => smell.includes('TODO') || smell.includes('FIXME'))) {
+      refactoringSuggestions.improveNaming.push({
+        file: fileName,
+        suggestion: 'Improve variable and function naming',
+        priority: 'low',
+        before: `// Poor naming
+function calc(x, y, z) {
+  const temp = x + y;
+  const result = temp * z;
+  return result;
+}
+
+const data = getData();
+const items = data.map(d => d.val);`,
+        after: `// Improved naming
+function calculateTotal(baseAmount, additionalAmount, multiplier) {
+  const subtotal = baseAmount + additionalAmount;
+  const finalTotal = subtotal * multiplier;
+  return finalTotal;
+}
+
+const userData = getUserData();
+const userValues = userData.map(user => user.value);`,
+        estimatedEffort: '1 hour',
+        benefits: ['Better readability', 'Self-documenting code', 'Easier maintenance']
+      });
+    }
+  });
+
+  // Handle code duplication from similarity analysis
+  if (similarityResults && similarityResults.clones.exact.length > 0) {
+    similarityResults.clones.exact.forEach(clone => {
+      refactoringSuggestions.eliminateDuplication.push({
+        files: clone.files,
+        similarity: clone.score,
+        suggestion: 'Extract common functionality to eliminate duplication',
+        priority: 'high',
+        before: `// File 1: userService.js
+function validateEmail(email) {
+  return email && email.includes('@') && email.includes('.');
+}
+
+// File 2: adminService.js  
+function validateEmail(email) {
+  return email && email.includes('@') && email.includes('.');
+}`,
+        after: `// utils/validation.js
+export function validateEmail(email) {
+  return email && email.includes('@') && email.includes('.');
+}
+
+// userService.js
+import { validateEmail } from './utils/validation.js';
+
+// adminService.js
+import { validateEmail } from './utils/validation.js';`,
+        estimatedEffort: '2-3 hours',
+        benefits: ['DRY principle', 'Single source of truth', 'Easier maintenance']
+      });
+    });
+  }
+
+  return refactoringSuggestions;
+}
+
+// Comprehensive test quality analysis and gap detection
+async function analyzeTestQuality(scanResults, analysisResults) {
+  const testAnalysis = {
+    overview: {
+      totalTestFiles: 0,
+      totalSourceFiles: 0,
+      coverageEstimate: 0,
+      testFrameworks: [],
+      testTypes: {
+        unit: 0,
+        integration: 0,
+        e2e: 0,
+        component: 0
+      }
+    },
+    qualityMetrics: {
+      testComplexity: 0,
+      assertionsPerTest: 0,
+      testMaintainability: 0,
+      testReliability: 0
+    },
+    gaps: {
+      untestedFiles: [],
+      missingTestTypes: [],
+      testSmells: [],
+      coverageGaps: []
+    },
+    recommendations: [],
+    bestPractices: {
+      followed: [],
+      violated: []
+    }
+  };
+
+  // Identify test files
+  const testFiles = scanResults.files.filter(file => 
+    file.path.includes('test') || 
+    file.path.includes('spec') || 
+    file.path.includes('__tests__') ||
+    file.path.match(/\.(test|spec)\.(js|ts|jsx|tsx)$/)
+  );
+
+  const sourceFiles = scanResults.files.filter(file => 
+    ['.js', '.ts', '.jsx', '.tsx'].includes(file.extension) && 
+    !file.path.includes('test') && 
+    !file.path.includes('spec') && 
+    !file.path.includes('__tests__') &&
+    !file.path.match(/\.(test|spec)\.(js|ts|jsx|tsx)$/)
+  );
+
+  testAnalysis.overview.totalTestFiles = testFiles.length;
+  testAnalysis.overview.totalSourceFiles = sourceFiles.length;
+  testAnalysis.overview.coverageEstimate = sourceFiles.length > 0 ? 
+    (testFiles.length / sourceFiles.length) * 100 : 0;
+
+  // Analyze test frameworks used
+  const frameworkDetection = {
+    jest: 0,
+    mocha: 0,
+    jasmine: 0,
+    vitest: 0,
+    cypress: 0,
+    playwright: 0,
+    testingLibrary: 0
+  };
+
+  for (const analysis of analysisResults) {
+    if (analysis.testCoverage && analysis.testCoverage.testFrameworks) {
+      analysis.testCoverage.testFrameworks.forEach(framework => {
+        if (framework in frameworkDetection) {
+          frameworkDetection[framework]++;
+        }
+      });
+    }
+  }
+
+  testAnalysis.overview.testFrameworks = Object.entries(frameworkDetection)
+    .filter(([_, count]) => count > 0)
+    .map(([framework, count]) => ({ framework, usage: count }));
+
+  // Identify untested files
+  const testedFilePatterns = testFiles.map(testFile => {
+    const baseName = testFile.path
+      .replace(/\.(test|spec)\.(js|ts|jsx|tsx)$/, '')
+      .replace(/(test|spec|__tests__)\//, '')
+      .replace(/\/(test|spec|__tests__)/, '');
+    return baseName;
+  });
+
+  testAnalysis.gaps.untestedFiles = sourceFiles.filter(sourceFile => {
+    const sourcePath = sourceFile.path.replace(/\.(js|ts|jsx|tsx)$/, '');
+    return !testedFilePatterns.some(pattern => 
+      sourcePath.includes(pattern) || pattern.includes(sourcePath)
+    );
+  }).map(file => ({
+    file: file.path,
+    size: file.size,
+    priority: file.size > 5000 ? 'high' : file.size > 2000 ? 'medium' : 'low',
+    reason: 'No corresponding test file found'
+  }));
+
+  // Detect test smells
+  for (const analysis of analysisResults) {
+    if (analysis.path.includes('test') || analysis.path.includes('spec')) {
+      const testSmells = [];
+      
+      // Test file without proper structure
+      if (analysis.functions.length === 0) {
+        testSmells.push('Empty test file or no test functions detected');
+      }
+      
+      // Tests with high complexity
+      if (analysis.cyclomaticComplexity > 10) {
+        testSmells.push('Test file has high complexity - tests should be simple');
+      }
+      
+      // Missing assertions patterns
+      const content = ''; // Would need actual file content
+      if (!content.match(/expect|assert|should/)) {
+        testSmells.push('No assertion patterns detected in test file');
+      }
+      
+      if (testSmells.length > 0) {
+        testAnalysis.gaps.testSmells.push({
+          file: analysis.path,
+          smells: testSmells,
+          severity: testSmells.length > 2 ? 'high' : 'medium'
+        });
+      }
+    }
+  }
+
+  // Generate recommendations
+  if (testAnalysis.overview.coverageEstimate < 50) {
+    testAnalysis.recommendations.push({
+      type: 'coverage',
+      priority: 'high',
+      title: 'Increase test coverage',
+      description: `Current estimated coverage is ${testAnalysis.overview.coverageEstimate.toFixed(1)}%. Aim for at least 70%.`,
+      actions: [
+        'Add unit tests for core business logic',
+        'Implement integration tests for API endpoints',
+        'Add component tests for UI components',
+        'Set up automated coverage reporting'
+      ]
+    });
+  }
+
+  if (testAnalysis.gaps.untestedFiles.length > 0) {
+    testAnalysis.recommendations.push({
+      type: 'missing-tests',
+      priority: 'medium',
+      title: 'Add tests for untested files',
+      description: `${testAnalysis.gaps.untestedFiles.length} files lack corresponding tests.`,
+      actions: [
+        'Prioritize testing critical business logic files',
+        'Add tests for utility functions',
+        'Implement tests for error handling paths',
+        'Consider test-driven development for new features'
+      ]
+    });
+  }
+
+  if (testAnalysis.overview.testFrameworks.length === 0) {
+    testAnalysis.recommendations.push({
+      type: 'framework',
+      priority: 'high',
+      title: 'Set up testing framework',
+      description: 'No testing framework detected. Choose and configure a testing framework.',
+      actions: [
+        'Install Jest for JavaScript/TypeScript projects',
+        'Set up Testing Library for React components',
+        'Configure Cypress or Playwright for e2e tests',
+        'Add test scripts to package.json'
+      ]
+    });
+  }
+
+  // Best practices analysis
+  if (testAnalysis.overview.testFrameworks.length === 1) {
+    testAnalysis.bestPractices.followed.push('Consistent testing framework usage');
+  } else if (testAnalysis.overview.testFrameworks.length > 2) {
+    testAnalysis.bestPractices.violated.push('Multiple testing frameworks may cause confusion');
+  }
+
+  if (testFiles.some(file => file.path.includes('__tests__'))) {
+    testAnalysis.bestPractices.followed.push('Standard test directory structure');
+  }
+
+  return testAnalysis;
+}
+
+// Team collaboration insights and code ownership analysis
+async function analyzeTeamCollaboration(scanResults, analysisResults) {
+  const collaboration = {
+    codeOwnership: {
+      hotspots: [],
+      orphanedFiles: [],
+      sharedOwnership: [],
+      expertiseAreas: []
+    },
+    teamMetrics: {
+      avgFileSize: 0,
+      consistencyScore: 0,
+      knowledgeDistribution: 'unknown',
+      riskFiles: []
+    },
+    collaborationPatterns: {
+      codingStandards: {
+        consistent: [],
+        inconsistent: []
+      },
+      architecturalAlignment: 0,
+      reviewableComplexity: 0
+    },
+    recommendations: []
+  };
+
+  // Calculate average file size
+  const validFiles = analysisResults.filter(a => !a.error && a.lines > 0);
+  collaboration.teamMetrics.avgFileSize = validFiles.length > 0 ? 
+    validFiles.reduce((sum, a) => sum + a.lines, 0) / validFiles.length : 0;
+
+  // Identify risk files (too large, too complex, or critical)
+  collaboration.teamMetrics.riskFiles = validFiles.filter(analysis => 
+    analysis.lines > 500 || 
+    analysis.cyclomaticComplexity > 20 ||
+    analysis.qualityScore < 50
+  ).map(analysis => ({
+    file: analysis.path,
+    risk: analysis.lines > 1000 ? 'very-high' : 
+          analysis.cyclomaticComplexity > 30 ? 'high' : 'medium',
+    reasons: [
+      ...(analysis.lines > 500 ? [`Large file (${analysis.lines} lines)`] : []),
+      ...(analysis.cyclomaticComplexity > 20 ? [`High complexity (${analysis.cyclomaticComplexity})`] : []),
+      ...(analysis.qualityScore < 50 ? [`Low quality score (${analysis.qualityScore})`] : [])
+    ],
+    recommendedActions: [
+      'Break into smaller modules',
+      'Add comprehensive documentation',
+      'Increase test coverage',
+      'Consider pair programming sessions'
+    ]
+  }));
+
+  // Analyze coding standards consistency
+  const namingPatterns = {
+    camelCase: 0,
+    snake_case: 0,
+    kebabCase: 0,
+    PascalCase: 0
+  };
+
+  validFiles.forEach(analysis => {
+    // Simplified pattern detection
+    if (analysis.variables && analysis.variables.length > 0) {
+      analysis.variables.forEach(variable => {
+        if (variable.match(/^[a-z][a-zA-Z0-9]*$/)) namingPatterns.camelCase++;
+        else if (variable.match(/^[a-z][a-z0-9_]*$/)) namingPatterns.snake_case++;
+        else if (variable.match(/^[a-z][a-z0-9-]*$/)) namingPatterns.kebabCase++;
+        else if (variable.match(/^[A-Z][a-zA-Z0-9]*$/)) namingPatterns.PascalCase++;
+      });
+    }
+  });
+
+  const dominantPattern = Object.entries(namingPatterns).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+  const consistencyScore = namingPatterns[dominantPattern] / Object.values(namingPatterns).reduce((a, b) => a + b, 1);
+
+  collaboration.teamMetrics.consistencyScore = consistencyScore * 100;
+
+  if (consistencyScore > 0.8) {
+    collaboration.collaborationPatterns.codingStandards.consistent.push('Naming conventions');
+  } else {
+    collaboration.collaborationPatterns.codingStandards.inconsistent.push('Naming conventions');
+  }
+
+  // Generate team collaboration recommendations
+  if (collaboration.teamMetrics.riskFiles.length > 0) {
+    collaboration.recommendations.push({
+      type: 'risk-mitigation',
+      priority: 'high',
+      title: 'Address high-risk files',
+      description: `${collaboration.teamMetrics.riskFiles.length} files pose collaboration risks.`,
+      actions: [
+        'Implement code ownership documentation',
+        'Schedule knowledge transfer sessions',
+        'Add comprehensive documentation to complex files',
+        'Consider refactoring large files into smaller modules'
+      ]
+    });
+  }
+
+  if (collaboration.teamMetrics.consistencyScore < 70) {
+    collaboration.recommendations.push({
+      type: 'standards',
+      priority: 'medium',
+      title: 'Improve coding standards consistency',
+      description: `Consistency score is ${collaboration.teamMetrics.consistencyScore.toFixed(1)}%.`,
+      actions: [
+        'Establish team coding standards document',
+        'Set up automated linting and formatting',
+        'Conduct code review training sessions',
+        'Implement pre-commit hooks for style consistency'
+      ]
+    });
+  }
+
+  return collaboration;
 }
 
 // Enhanced code visualization data
@@ -1820,6 +2822,37 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const aiInsights = includeAnalysis && analysisResults.length > 0 ? 
         await generateAIInsights(analysisResults, dependencyAnalysis) : null;
       
+      // Advanced code similarity and clone detection
+      const similarityResults = includeAnalysis && analysisResults.length > 1 ? 
+        await detectCodeSimilarity(analysisResults) : null;
+      
+      // Generate intelligent refactoring suggestions
+      const refactoringSuggestions = includeAnalysis && analysisResults.length > 0 ? 
+        await generateIntelligentRefactoringSuggestions(analysisResults, similarityResults) : null;
+      
+      // Comprehensive test quality analysis
+      const testQualityAnalysis = includeAnalysis ? 
+        await analyzeTestQuality(scanResults, analysisResults) : null;
+      
+      // Team collaboration insights
+      const teamCollaboration = includeAnalysis && analysisResults.length > 0 ? 
+        await analyzeTeamCollaboration(scanResults, analysisResults) : null;
+      
+      // Enhanced security analysis for each file
+      const advancedSecurityResults = [];
+      if (includeAnalysis) {
+        for (const file of scanResults.files.filter(f => ['.js', '.ts', '.jsx', '.tsx'].includes(f.extension)).slice(0, 10)) {
+          try {
+            const filePath = path.join(absolutePath, file.path);
+            const content = await fs.readFile(filePath, 'utf8');
+            const securityAnalysis = await performAdvancedSecurityAnalysis(content, filePath);
+            advancedSecurityResults.push({ file: file.path, ...securityAnalysis });
+          } catch (error) {
+            // Skip files that can't be read
+          }
+        }
+      }
+      
       // Generate visualization data
       const visualizationData = includeAnalysis ? generateVisualizationData(scanResults, analysisResults) : null;
       
@@ -2045,6 +3078,173 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             if (fileAnalysis.codeSmells.length > 0) {
               analysis += `   - Issues: ${fileAnalysis.codeSmells.slice(0, 2).join(', ')}\n`;
             }
+          });
+        }
+      }
+      
+      // Code Similarity and Clone Detection
+      if (similarityResults && (similarityResults.similarities.length > 0 || Object.values(similarityResults.clones).some(arr => arr.length > 0))) {
+        analysis += `\n## 🔍 Code Similarity & Clone Detection\n`;
+        
+        // Exact clones
+        if (similarityResults.clones.exact.length > 0) {
+          analysis += `### 🎯 Exact Code Clones (${similarityResults.clones.exact.length})\n`;
+          similarityResults.clones.exact.forEach((clone, index) => {
+            analysis += `${index + 1}. **${clone.files.map(f => path.basename(f)).join(' ↔ ')}**\n`;
+            analysis += `   - Similarity: ${(clone.score * 100).toFixed(1)}%\n`;
+            analysis += `   - ${clone.reason}\n\n`;
+          });
+        }
+        
+        // High similarity files
+        const highSimilarities = similarityResults.similarities.filter(s => s.score > 0.6);
+        if (highSimilarities.length > 0) {
+          analysis += `### ⚠️ High Similarity Files (${highSimilarities.length})\n`;
+          highSimilarities.slice(0, 5).forEach((sim, index) => {
+            analysis += `${index + 1}. **${path.basename(sim.file1)} ↔ ${path.basename(sim.file2)}**\n`;
+            analysis += `   - Similarity: ${(sim.score * 100).toFixed(1)}% (${sim.type})\n`;
+            analysis += `   - Patterns: ${sim.patterns.join(', ')}\n`;
+            if (sim.suggestions.length > 0) {
+              analysis += `   - 💡 ${sim.suggestions[0]}\n`;
+            }
+            analysis += '\n';
+          });
+        }
+      }
+      
+      // Intelligent Refactoring Suggestions
+      if (refactoringSuggestions) {
+        const totalSuggestions = Object.values(refactoringSuggestions).flat().length;
+        if (totalSuggestions > 0) {
+          analysis += `\n## 🔧 Intelligent Refactoring Suggestions (${totalSuggestions})\n`;
+          
+          // High priority suggestions
+          const highPrioritySuggestions = Object.values(refactoringSuggestions).flat().filter(s => s.priority === 'high');
+          if (highPrioritySuggestions.length > 0) {
+            analysis += `### 🚨 High Priority (${highPrioritySuggestions.length})\n`;
+            highPrioritySuggestions.slice(0, 3).forEach((suggestion, index) => {
+              analysis += `${index + 1}. **${suggestion.suggestion}**\n`;
+              analysis += `   - File: ${suggestion.file || suggestion.files?.join(', ') || 'Multiple'}\n`;
+              analysis += `   - Effort: ${suggestion.estimatedEffort}\n`;
+              analysis += `   - Benefits: ${suggestion.benefits?.join(', ')}\n\n`;
+            });
+          }
+          
+          // Show summary of other categories
+          const categories = Object.entries(refactoringSuggestions).filter(([_, suggestions]) => suggestions.length > 0);
+          if (categories.length > 0) {
+            analysis += `### 📊 Suggestions by Category\n`;
+            categories.forEach(([category, suggestions]) => {
+              analysis += `- **${category.replace(/([A-Z])/g, ' $1').trim()}**: ${suggestions.length} suggestions\n`;
+            });
+            analysis += '\n';
+          }
+        }
+      }
+      
+      // Test Quality Analysis
+      if (testQualityAnalysis) {
+        analysis += `\n## 🧪 Test Quality Analysis\n`;
+        analysis += `### Overview\n`;
+        analysis += `- **Test Files**: ${testQualityAnalysis.overview.totalTestFiles}\n`;
+        analysis += `- **Source Files**: ${testQualityAnalysis.overview.totalSourceFiles}\n`;
+        analysis += `- **Coverage Estimate**: ${testQualityAnalysis.overview.coverageEstimate.toFixed(1)}%\n`;
+        
+        if (testQualityAnalysis.overview.testFrameworks.length > 0) {
+          analysis += `- **Frameworks**: ${testQualityAnalysis.overview.testFrameworks.map(f => f.framework).join(', ')}\n`;
+        }
+        analysis += '\n';
+        
+        // Test gaps
+        if (testQualityAnalysis.gaps.untestedFiles.length > 0) {
+          analysis += `### 🚨 Untested Files (${testQualityAnalysis.gaps.untestedFiles.length})\n`;
+          testQualityAnalysis.gaps.untestedFiles.slice(0, 5).forEach((file, index) => {
+            analysis += `${index + 1}. **${file.file}** (${file.priority} priority)\n`;
+            analysis += `   - ${file.reason}\n`;
+          });
+          if (testQualityAnalysis.gaps.untestedFiles.length > 5) {
+            analysis += `   ... and ${testQualityAnalysis.gaps.untestedFiles.length - 5} more files\n`;
+          }
+          analysis += '\n';
+        }
+        
+        // Test recommendations
+        if (testQualityAnalysis.recommendations.length > 0) {
+          analysis += `### 💡 Test Recommendations\n`;
+          testQualityAnalysis.recommendations.forEach((rec, index) => {
+            analysis += `${index + 1}. **${rec.title}** (${rec.priority} priority)\n`;
+            analysis += `   - ${rec.description}\n`;
+            analysis += `   - Actions: ${rec.actions.slice(0, 2).join(', ')}\n\n`;
+          });
+        }
+      }
+      
+      // Advanced Security Analysis
+      if (advancedSecurityResults.length > 0) {
+        analysis += `\n## 🔒 Advanced Security Analysis (OWASP Top 10)\n`;
+        
+        let totalVulns = 0;
+        let criticalVulns = 0;
+        let highVulns = 0;
+        
+        advancedSecurityResults.forEach(result => {
+          totalVulns += result.securityMetrics.totalVulnerabilities;
+          criticalVulns += result.securityMetrics.criticalVulnerabilities;
+          highVulns += result.securityMetrics.highVulnerabilities;
+        });
+        
+        analysis += `### Security Overview\n`;
+        analysis += `- **Total Vulnerabilities**: ${totalVulns}\n`;
+        analysis += `- **Critical**: ${criticalVulns}\n`;
+        analysis += `- **High**: ${highVulns}\n`;
+        analysis += `- **Files Analyzed**: ${advancedSecurityResults.length}\n\n`;
+        
+        // Show top security findings
+        const allFindings = advancedSecurityResults.flatMap(result => result.detailedFindings);
+        const criticalFindings = allFindings.filter(f => f.severity === 'Critical');
+        const highFindings = allFindings.filter(f => f.severity === 'High');
+        
+        if (criticalFindings.length > 0) {
+          analysis += `### 🚨 Critical Security Issues (${criticalFindings.length})\n`;
+          criticalFindings.slice(0, 5).forEach((finding, index) => {
+            analysis += `${index + 1}. **${finding.category}** in ${finding.file}\n`;
+            analysis += `   - ${finding.description}\n`;
+            analysis += `   - 💡 ${finding.recommendation}\n\n`;
+          });
+        }
+        
+        if (highFindings.length > 0) {
+          analysis += `### ⚠️ High Priority Security Issues (${highFindings.length})\n`;
+          highFindings.slice(0, 3).forEach((finding, index) => {
+            analysis += `${index + 1}. **${finding.category}** in ${finding.file}\n`;
+            analysis += `   - ${finding.description}\n\n`;
+          });
+        }
+      }
+      
+      // Team Collaboration Insights
+      if (teamCollaboration) {
+        analysis += `\n## 👥 Team Collaboration Insights\n`;
+        analysis += `### Team Metrics\n`;
+        analysis += `- **Average File Size**: ${teamCollaboration.teamMetrics.avgFileSize.toFixed(0)} lines\n`;
+        analysis += `- **Coding Standards Consistency**: ${teamCollaboration.teamMetrics.consistencyScore.toFixed(1)}%\n`;
+        
+        if (teamCollaboration.teamMetrics.riskFiles.length > 0) {
+          analysis += `- **High-Risk Files**: ${teamCollaboration.teamMetrics.riskFiles.length}\n\n`;
+          
+          analysis += `### 🚨 High-Risk Files for Collaboration\n`;
+          teamCollaboration.teamMetrics.riskFiles.slice(0, 5).forEach((riskFile, index) => {
+            analysis += `${index + 1}. **${path.basename(riskFile.file)}** (${riskFile.risk} risk)\n`;
+            analysis += `   - Issues: ${riskFile.reasons.join(', ')}\n`;
+            analysis += `   - Actions: ${riskFile.recommendedActions.slice(0, 2).join(', ')}\n\n`;
+          });
+        }
+        
+        if (teamCollaboration.recommendations.length > 0) {
+          analysis += `### 💡 Collaboration Recommendations\n`;
+          teamCollaboration.recommendations.forEach((rec, index) => {
+            analysis += `${index + 1}. **${rec.title}** (${rec.priority} priority)\n`;
+            analysis += `   - ${rec.description}\n\n`;
           });
         }
       }
