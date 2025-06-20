@@ -1,17 +1,67 @@
 {
   "name": "gemini-mcp",
-  "version": "1.0.0",
-  "description": "Simple Gemini MCP for Claude Code",
+  "version": "2.0.0",
+  "description": "Advanced Model Context Protocol server with AI-powered development tools, comprehensive codebase analysis, and intelligent code generation for Claude Code",
   "type": "module",
   "main": "src/server.js",
   "bin": {
     "gemini-mcp": "src/server.js"
   },
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "echo \"Tests not implemented yet\" && exit 0",
+    "test:unit": "echo \"Unit tests not implemented yet\" && exit 0",
+    "test:integration": "echo \"Integration tests not implemented yet\" && exit 0",
+    "lint": "echo \"Linting not configured yet\" && exit 0",
+    "format": "echo \"Formatting not configured yet\" && exit 0",
+    "validate": "node -c src/server.js",
+    "docs": "echo \"Documentation generation not implemented yet\" && exit 0",
+    "check": "npm run validate && npm run test",
+    "prepare": "npm run check"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "claude-code",
+    "gemini",
+    "ai",
+    "code-analysis",
+    "development-tools",
+    "code-generation",
+    "static-analysis",
+    "security-scanning",
+    "performance-analysis",
+    "technical-debt",
+    "dependency-analysis",
+    "openrouter"
+  ],
+  "author": {
+    "name": "Emmet",
+    "url": "https://github.com/emmron"
+  },
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/emmron/gemini-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/emmron/gemini-mcp/issues"
+  },
+  "homepage": "https://github.com/emmron/gemini-mcp#readme",
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "openai": "^4.67.0"
-  }
+  },
+  "devDependencies": {},
+  "peerDependencies": {},
+  "files": [
+    "src/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ]
 }
