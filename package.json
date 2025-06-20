@@ -1,7 +1,7 @@
 {
   "name": "gemini-mcp",
-  "version": "2.0.0",
-  "description": "Revolutionary AI Code Intelligence Platform - The world's most advanced MCP server with quantum-grade security, zero-day prediction, and business impact analysis for Claude Code",
+  "version": "2.1.0",
+  "description": "Professional Gemini MCP Server - Real-time AI assistance with comprehensive development tools for Claude Desktop, Cursor, and VS Code",
   "type": "module",
   "main": "src/server.js",
   "bin": {
