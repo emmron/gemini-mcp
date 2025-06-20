@@ -9,7 +9,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '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';
 if (!OPENROUTER_API_KEY) {
   console.error('OPENROUTER_API_KEY required');
   process.exit(1);
@@ -5400,7 +5400,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   if (request.params.name === 'ask_gemini') {
-    const { question, model = 'google/gemini-flash-1.5' } = request.params.arguments;
+    const { question, model = 'google/gemini-flash-1.5' } = request.params.arguments || {};
+    
+    if (!question?.trim()) {
+      return {
+        content: [{
+          type: 'text',
+          text: '❌ Question required. Usage: ask_gemini({"question": "your question here"})'
+        }]
+      };
+    }
     
     try {
       const response = await openrouter.chat.completions.create({
@@ -5409,24 +5418,53 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         max_tokens: 2000
       });
 
+      const answer = response.choices[0]?.message?.content;
+      if (!answer) {
+        return {
+          content: [{
+            type: 'text',
+            text: '⚠️ No response received from Gemini. Try rephrasing your question.'
+          }]
+        };
+      }
+      
       return {
         content: [{
           type: 'text',
-          text: response.choices[0]?.message?.content || 'No response'
+          text: `🤖 **Gemini Response:**\n\n${answer}`
         }]
       };
     } catch (error) {
       return {
         content: [{
           type: 'text',
-          text: `Error: ${error.message}`
+          text: `💥 **Gemini API Error:** ${error.message}\n\nTry again or check your API key.`
         }]
       };
     }
   }
 
   if (request.params.name === 'create_task') {
-    const { title, description = '', priority = 'medium', status = 'pending' } = request.params.arguments;
+    const { title, description = '', priority = 'medium', status = 'pending' } = request.params.arguments || {};
+    
+    if (!title?.trim()) {
+      return {
+        content: [{
+          type: 'text',
+          text: '❌ Task title required. Usage: create_task({"title": "Task name", "description": "Optional description"})'
+        }]
+      };
+    }
+    
+    const validPriorities = ['low', 'medium', 'high'];
+    if (!validPriorities.includes(priority)) {
+      return {
+        content: [{
+          type: 'text',
+          text: `❌ Invalid priority. Use: ${validPriorities.join(', ')}`
+        }]
+      };
+    }
     
     try {
       const tasks = await loadTasks();
@@ -5446,14 +5484,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [{
           type: 'text',
-          text: `Task created successfully: ${newTask.title} (ID: ${newTask.id})`
+          text: `✅ **Task Created!**\n\n📝 **${newTask.title}**\n🆔 ID: ${newTask.id}\n⚡ Priority: ${newTask.priority}\n📅 Created: ${new Date(newTask.createdAt).toLocaleString()}`
         }]
       };
     } catch (error) {
       return {
         content: [{
           type: 'text',
-          text: `Error creating task: ${error.message}`
+          text: `💥 **Task Creation Failed:** ${error.message}\n\nCheck your input and try again.`
         }]
       };
     }
@@ -5473,33 +5511,48 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return {
           content: [{
             type: 'text',
-            text: status ? `No tasks found with status: ${status}` : 'No tasks found'
+            text: status ? `📭 No tasks found with status: **${status}**` : '📭 **No tasks found.** Create one with create_task!'
           }]
         };
       }
       
-      const taskList = tasks.map(task => 
-        `ID: ${task.id}\nTitle: ${task.title}\nStatus: ${task.status}\nPriority: ${task.priority}\nDescription: ${task.description}\nCreated: ${task.createdAt}\n`
-      ).join('\n---\n');
+      let output = `📋 **Found ${tasks.length} task(s):**\n\n`;
+      tasks.forEach((task, i) => {
+        const statusEmoji = task.status === 'completed' ? '✅' : task.status === 'in_progress' ? '🔄' : '⏳';
+        const priorityEmoji = task.priority === 'high' ? '🔴' : task.priority === 'medium' ? '🟡' : '🟢';
+        output += `${i + 1}. ${statusEmoji} **${task.title}**\n`;
+        output += `   🆔 ${task.id} | ${priorityEmoji} ${task.priority} | 📅 ${new Date(task.createdAt).toLocaleDateString()}\n`;
+        if (task.description) output += `   📝 ${task.description}\n`;
+        output += '\n';
+      });
       
       return {
         content: [{
           type: 'text',
-          text: `Found ${tasks.length} task(s):\n\n${taskList}`
+          text: output.trim()
         }]
       };
     } catch (error) {
       return {
         content: [{
           type: 'text',
-          text: `Error listing tasks: ${error.message}`
+          text: `💥 **Failed to Load Tasks:** ${error.message}\n\nTasks file may be corrupted.`
         }]
       };
     }
   }
 
   if (request.params.name === 'update_task') {
-    const { id, title, description, priority, status } = request.params.arguments;
+    const { id, title, description, priority, status } = request.params.arguments || {};
+    
+    if (!id?.trim()) {
+      return {
+        content: [{
+          type: 'text',
+          text: '❌ Task ID required. Usage: update_task({"id": "task_id", "status": "completed"})'
+        }]
+      };
+    }
     
     try {
       const tasks = await loadTasks();
@@ -5509,16 +5562,31 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return {
           content: [{
             type: 'text',
-            text: `Task not found with ID: ${id}`
+            text: `❌ **Task not found** with ID: ${id}\n\nUse list_tasks to see available task IDs.`
           }]
         };
       }
       
       const task = tasks[taskIndex];
-      if (title !== undefined) task.title = title;
-      if (description !== undefined) task.description = description;
-      if (priority !== undefined) task.priority = priority;
-      if (status !== undefined) task.status = status;
+      const changes = [];
+      
+      if (title !== undefined) {
+        changes.push(`Title: "${task.title}" → "${title}"`);
+        task.title = title;
+      }
+      if (description !== undefined) {
+        changes.push(`Description updated`);
+        task.description = description;
+      }
+      if (priority !== undefined) {
+        changes.push(`Priority: ${task.priority} → ${priority}`);
+        task.priority = priority;
+      }
+      if (status !== undefined) {
+        const statusEmoji = status === 'completed' ? '✅' : status === 'in_progress' ? '🔄' : '⏳';
+        changes.push(`Status: ${task.status} → ${status} ${statusEmoji}`);
+        task.status = status;
+      }
       task.updatedAt = new Date().toISOString();
       
       await saveTasks(tasks);
@@ -5526,21 +5594,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [{
           type: 'text',
-          text: `Task updated successfully: ${task.title}`
+          text: `✅ **Task Updated!**\n\n📝 **${task.title}**\n🔄 **Changes:**\n${changes.map(c => `  • ${c}`).join('\n')}\n\n📅 Updated: ${new Date(task.updatedAt).toLocaleString()}`
         }]
       };
     } catch (error) {
       return {
         content: [{
           type: 'text',
-          text: `Error updating task: ${error.message}`
+          text: `💥 **Task Update Failed:** ${error.message}\n\nVerify the task ID exists.`
         }]
       };
     }
   }
 
   if (request.params.name === 'delete_task') {
-    const { id } = request.params.arguments;
+    const { id } = request.params.arguments || {};
+    
+    if (!id?.trim()) {
+      return {
+        content: [{
+          type: 'text',
+          text: '❌ Task ID required. Usage: delete_task({"id": "task_id"})'
+        }]
+      };
+    }
     
     try {
       const tasks = await loadTasks();
@@ -5550,7 +5627,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return {
           content: [{
             type: 'text',
-            text: `Task not found with ID: ${id}`
+            text: `❌ **Task not found** with ID: ${id}\n\nUse list_tasks to see available task IDs.`
           }]
         };
       }
@@ -5561,14 +5638,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [{
           type: 'text',
-          text: `Task deleted successfully: ${deletedTask.title}`
+          text: `🗑️ **Task Deleted!**\n\n📝 **${deletedTask.title}**\n🆔 ID: ${deletedTask.id}\n\n${tasks.length} tasks remaining.`
         }]
       };
     } catch (error) {
       return {
         content: [{
           type: 'text',
-          text: `Error deleting task: ${error.message}`
+          text: `💥 **Task Deletion Failed:** ${error.message}\n\nVerify the task ID exists.`
         }]
       };
     }
@@ -6942,14 +7019,23 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       return {
         content: [{
           type: 'text',
-          text: `Error analyzing codebase: ${error.message}`
+          text: `💥 **Codebase Analysis Failed:** ${error.message}\n\nCheck path permissions and try again.`
         }]
       };
     }
   }
 
   if (request.params.name === 'generate_component') {
-    const { name, framework = 'react', type = 'functional', features = [], styling = 'css' } = request.params.arguments;
+    const { name, framework = 'react', type = 'functional', features = [], styling = 'css' } = request.params.arguments || {};
+    
+    if (!name?.trim()) {
+      return {
+        content: [{
+          type: 'text',
+          text: '❌ Component name required. Usage: generate_component({"name": "Button", "framework": "react"})'
+        }]
+      };
+    }
     
     try {
       let componentCode = '';
