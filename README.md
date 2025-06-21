@@ -8,7 +8,7 @@
 ![Revolutionary](https://img.shields.io/badge/Revolutionary-Intelligence-gold.svg)
 ![Zero Day](https://img.shields.io/badge/Zero--Day-Prediction-red.svg)
 ![Quantum Ready](https://img.shields.io/badge/Quantum-Ready-blue.svg)
-![Tools](https://img.shields.io/badge/Tools-19-brightgreen.svg)
+![Tools](https://img.shields.io/badge/Tools-27-brightgreen.svg)
 
 **The world's most advanced Model Context Protocol (MCP) server for Claude Code. Revolutionary AI-powered code intelligence with business impact analysis, quantum-grade security, and zero-day vulnerability prediction.**
 
@@ -99,7 +99,7 @@ docker run -e OPENROUTER_API_KEY=your-key emmron/gemini-mcp
 
 ## 🔍 Complete Tool Suite
 
-### Overview: 19 Revolutionary Tools
+### Overview: 27 Revolutionary Tools
 
 Gemini MCP provides a comprehensive suite of 19 tools organized into 6 categories:
 

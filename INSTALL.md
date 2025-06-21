@@ -1,4 +1,6 @@
-# Installation Guide - Gemini MCP Server
+# Gemini MCP Server - Context7-Quality Installation
+
+Real-time AI assistance with context awareness for development workflows.
 
 ## Quick Start
 
@@ -6,11 +8,11 @@
 npx gemini-mcp
 ```
 
-## Claude Desktop Setup
+## Claude Desktop Configuration
 
-Add to your Claude Desktop configuration file:
+Add to your Claude Desktop config:
 
-**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`  
 **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
@@ -18,81 +20,69 @@ Add to your Claude Desktop configuration file:
   "mcpServers": {
     "gemini-mcp": {
       "command": "npx",
-      "args": ["gemini-mcp"],
-      "env": {
-        "OPENROUTER_API_KEY": "your-api-key-here"
-      }
-    }
-  }
-}
-```
-
-## Cursor Setup
-
-Add to your Cursor settings:
-
-```json
-{
-  "mcp.servers": {
-    "gemini-mcp": {
-      "command": "npx",
       "args": ["gemini-mcp"]
     }
   }
 }
 ```
 
-## VS Code Setup
+## Usage
 
-Install the MCP extension and add:
+Like Context7, simply use the tools in your prompts:
 
-```json
-{
-  "mcp.servers": [
-    {
-      "name": "gemini-mcp",
-      "command": "npx",
-      "args": ["gemini-mcp"]
-    }
-  ]
-}
+### Real-Time AI Assistance
+```
+Use get_gemini_context to ask: "How do I implement JWT authentication in Next.js?"
 ```
 
-## API Key Configuration
+### Project Context Analysis  
+```
+Use analyze_current_context to understand my current project structure and dependencies
+```
 
-Set your OpenRouter API key:
+## Tools Available
+
+### `get_gemini_context`
+- **Purpose:** Real-time AI assistance with current context awareness
+- **Parameters:**
+  - `query` (required) - Your development question
+  - `context_type` - Type of assistance (code, debug, architecture, best_practices, implementation)  
+  - `framework` - Current technology stack
+  - `include_examples` - Include practical code examples
+
+### `analyze_current_context`
+- **Purpose:** Analyze current working directory and provide insights
+- **Parameters:**
+  - `focus` - What to analyze (structure, dependencies, patterns, issues, improvements)
+  - `depth` - Analysis level (quick, detailed, comprehensive)
+
+## Why Gemini MCP?
+
+Like Context7 provides up-to-date documentation, Gemini MCP provides:
+
+✅ **Real-time AI assistance** with current best practices  
+✅ **Context-aware responses** based on your actual project  
+✅ **Practical examples** that work with your tech stack  
+✅ **Smart project analysis** with actionable recommendations  
+✅ **Universal compatibility** with all MCP clients  
+
+## API Configuration
+
+Set your OpenRouter API key (optional - has built-in fallback):
 
 ```bash
 export OPENROUTER_API_KEY="your-key-here"
 ```
 
-Or it will use the built-in fallback key.
+## Compatibility
 
-## Available Tools
+- ✅ Claude Desktop
+- ✅ Cursor  
+- ✅ VS Code (with MCP extension)
+- ✅ Windsurf
+- ✅ Any MCP-compatible client
 
-✅ **ask_gemini** - Real-time Gemini AI assistance
-✅ **create_task** - Task management
-✅ **list_tasks** - View all tasks  
-✅ **update_task** - Modify tasks
-✅ **delete_task** - Remove tasks
-✅ **analyze_codebase** - Comprehensive code analysis
-✅ **generate_component** - React/Vue/Angular components
-✅ **scaffold_project** - Project templates
-✅ **optimize_code** - Performance optimization
-✅ **generate_styles** - CSS/SCSS generation
-✅ **generate_api** - REST API endpoints
-✅ **generate_schema** - Database schemas
-✅ **generate_tests** - Unit/integration tests
-✅ **generate_hook** - React hooks
-✅ **generate_dockerfile** - Container configuration
-✅ **generate_deployment** - K8s/Docker deployment
-✅ **generate_env** - Environment configuration
-✅ **generate_monitoring** - Observability setup
-✅ **generate_middleware** - Express/Fastify middleware
+## Support
 
-## Troubleshooting
-
-- Ensure Node.js 18+ is installed
-- Check your MCP client supports the latest protocol
-- Verify API key permissions
-- Use `npm run test` to validate installation
+- GitHub: https://github.com/emmron/gemini-mcp
+- Issues: https://github.com/emmron/gemini-mcp/issues
