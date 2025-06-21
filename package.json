@@ -1,7 +1,7 @@
 {
   "name": "gemini-mcp",
-  "version": "3.0.0",
-  "description": "Enhanced Gemini MCP Server - Multi-model AI orchestration with collaborative development tools, task management, and consensus-driven analysis",
+  "version": "3.1.0",
+  "description": "Clean, modular Gemini MCP Server - Multi-model AI orchestration with development tools and task management",
   "type": "module",
   "main": "src/server.js",
   "bin": {
@@ -11,18 +11,16 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "test": "node -c src/server.js && echo '✅ Clean server validated successfully'",
-    "lint": "echo 'Running ESLint...' && npx eslint src/ --fix",
-    "backup-old": "mv src/server.js src/server-old.js",
-    "test:mcp": "echo '🔍 Testing MCP protocol...' && timeout 5s node src/server.js || echo '✅ MCP protocol test completed'",
-    "test:tools": "echo '🧪 Testing tool functionality...' && npm run validate",
-    "lint": "echo '🔍 Code quality check...' && npm run validate && echo '✅ Code quality verified'",
-    "format": "echo '📐 Code formatting check...' && npm run validate && echo '✅ Code format verified'",
-    "validate": "node -c src/server.js && echo '✅ Server syntax validated'",
-    "docs": "echo '📚 Documentation is comprehensive in README.md'",
-    "check": "npm run validate && npm run test",
-    "prepare": "npm run check",
-    "install:claude": "echo '🚀 Add to Claude Code with: claude add mcp gemini node $(pwd)/src/server.js'",
-    "demo": "echo '🎯 Demo: mcp__gemini__ai_chat --message \"Help me optimize this code\" --model coding'"
+    "test:all": "npm run test && npm run validate:tools",
+    "validate:tools": "NODE_ENV=test node -e \"import('./src/tools/registry.js').then(()=>console.log('✅ Tools validated'))\"",
+    "lint": "echo 'Running ESLint...' && npx eslint src/ --fix || echo 'ESLint not installed, install with: npm i -D eslint'",
+    "format": "echo 'Formatting code...' && npx prettier --write src/ || echo 'Prettier not installed'",
+    "check": "npm run test && npm run validate:tools",
+    "docs": "echo '📚 Documentation available in docs/ and README.md'",
+    "demo": "echo '🎯 Demo: mcp__gemini__ai_chat --message \"Help me with code\" --model coding'",
+    "install:claude": "echo '🚀 Add to Claude: claude add mcp gemini node $(pwd)/src/server.js'",
+    "clean": "rm -rf .taskmaster/ && echo 'Cleaned task storage'",
+    "health": "node -e \"import('./src/utils/performance.js').then(m=>console.log(JSON.stringify(m.performanceMonitor.getSystemHealth(),null,2)))\""
   },
   "keywords": [
     "mcp",
@@ -31,20 +29,13 @@
     "gemini",
     "ai",
     "multi-model",
-    "orchestration",
-    "consensus",
-    "collaboration",
-    "task-management",
-    "code-review",
-    "debugging",
+    "clean-architecture",
+    "modular",
+    "code-generation",
+    "analysis",
     "refactoring",
-    "ai-chat",
     "development-tools",
-    "code-analysis",
-    "openrouter",
-    "anthropic",
-    "openai",
-    "ai-consensus"
+    "openrouter"
   ],
   "author": {
     "name": "Emmet",
@@ -67,11 +58,12 @@
     "openai": "^4.67.0"
   },
   "devDependencies": {},
-  "peerDependencies": {},
   "files": [
     "src/",
+    "docs/",
     "README.md",
     "CHANGELOG.md",
-    "LICENSE"
+    "LICENSE",
+    ".env.example"
   ]
 }

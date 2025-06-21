@@ -5,14 +5,18 @@ import { validateString } from '../utils/validation.js';
 
 class AIClient {
   constructor() {
-    if (!process.env.OPENROUTER_API_KEY) {
+    if (!process.env.OPENROUTER_API_KEY && process.env.NODE_ENV !== 'test') {
       throw new Error('OPENROUTER_API_KEY environment variable is required');
     }
     
-    this.client = new OpenAI({
-      baseURL: 'https://openrouter.ai/api/v1',
-      apiKey: process.env.OPENROUTER_API_KEY,
-    });
+    if (process.env.OPENROUTER_API_KEY) {
+      this.client = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: process.env.OPENROUTER_API_KEY,
+      });
+    } else {
+      this.client = null; // Test mode
+    }
   }
 
   selectModel(taskType = 'main', complexity = 'medium') {
@@ -35,6 +39,11 @@ class AIClient {
   async call(prompt, modelType = 'main', options = {}) {
     try {
       validateString(prompt, 'prompt', 50000);
+      
+      if (!this.client) {
+        logger.warn('AI client not initialized (test mode)');
+        return `[TEST MODE] AI response for: ${prompt.substring(0, 100)}...`;
+      }
       
       const model = this.selectModel(modelType, options.complexity);
       const startTime = Date.now();

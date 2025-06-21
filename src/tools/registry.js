@@ -56,21 +56,21 @@ class ToolRegistry {
         const { code, language = 'javascript', analysis_type = 'comprehensive' } = args;
         validateString(code, 'code', 10000);
         
-        const prompt = \`Analyze this \${language} code for \${analysis_type} review:
+        const prompt = `Analyze this ${language} code for ${analysis_type} review:
 
-\\\`\\\`\\\`\${language}
-\${code}
-\\\`\\\`\\\`
+\`\`\`${language}
+${code}
+\`\`\`
 
 Provide:
 1. Code quality assessment
 2. Security vulnerabilities
 3. Performance issues
 4. Best practice violations
-5. Specific improvement suggestions\`;
+5. Specific improvement suggestions`;
 
         const analysis = await aiClient.call(prompt, 'analysis');
-        return \`📊 **Code Analysis** (\${analysis_type})\\n\\n\${analysis}\`;
+        return `📊 **Code Analysis** (${analysis_type})\\n\\n${analysis}`;
       }
     );
 
@@ -87,19 +87,19 @@ Provide:
         const { requirements, project_type = 'general', complexity = 'medium' } = args;
         validateString(requirements, 'requirements');
         
-        const prompt = \`Break down these project requirements into specific, actionable tasks:
+        const prompt = `Break down these project requirements into specific, actionable tasks:
 
-\${requirements}
+${requirements}
 
-Project Type: \${project_type}
-Complexity: \${complexity}
+Project Type: ${project_type}
+Complexity: ${complexity}
 
 Create a structured task list with:
 1. Clear task descriptions
 2. Priority levels (high/medium/low)
 3. Estimated effort
 4. Dependencies between tasks
-5. Implementation order\`;
+5. Implementation order`;
 
         const taskBreakdown = await aiClient.call(prompt, 'main', { complexity });
         
@@ -111,7 +111,7 @@ Create a structured task list with:
         taskData.updated = timestamp;
         await storage.write('tasks', taskData);
         
-        return \`📋 **Project Tasks Created**\\n\\n\${taskBreakdown}\`;
+        return `📋 **Project Tasks Created**\\n\\n${taskBreakdown}`;
       }
     );
 
@@ -139,7 +139,7 @@ Create a structured task list with:
   async executeTool(name, args) {
     const tool = this.tools.get(name);
     if (!tool) {
-      throw new Error(\`Tool '\${name}' not found\`);
+      throw new Error(`Tool '${name}' not found`);
     }
 
     try {
