@@ -2,6 +2,8 @@ import { aiClient } from '../ai/client.js';
 import { storage } from '../storage/storage.js';
 import { logger } from '../utils/logger.js';
 import { validateString, validateObject } from '../utils/validation.js';
+import { codeTools } from './code-tools.js';
+import { analysisTools } from './analysis-tools.js';
 
 class ToolRegistry {
   constructor() {
@@ -113,7 +115,17 @@ Create a structured task list with:
       }
     );
 
+    // Register additional tools from modules
+    this.registerToolsFromModule(codeTools);
+    this.registerToolsFromModule(analysisTools);
+    
     logger.info('Tool registry initialized', { toolCount: this.tools.size });
+  }
+
+  registerToolsFromModule(toolsModule) {
+    Object.entries(toolsModule).forEach(([name, tool]) => {
+      this.registerTool(name, tool.description, tool.parameters, tool.handler);
+    });
   }
 
   getToolList() {
