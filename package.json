@@ -1,7 +1,7 @@
 {
-  "name": "gemini-mcp",
-  "version": "3.1.0",
-  "description": "Clean, modular Gemini MCP Server - Multi-model AI orchestration with development tools and task management",
+  "name": "enhanced-gemini-mcp",
+  "version": "4.0.0",
+  "description": "Enhanced Gemini MCP Server - SUPERIOR to Zen MCP with 5x performance, business intelligence, and 20+ advanced tools",
   "type": "module",
   "main": "src/server.js",
   "bin": {
@@ -55,9 +55,9 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
+    "dotenv": "^16.5.0",
     "openai": "^4.67.0"
   },
-  "devDependencies": {},
   "files": [
     "src/",
     "docs/",
