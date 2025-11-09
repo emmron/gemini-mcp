@@ -35,6 +35,7 @@
 ## 📋 Table of Contents
 
 - [🚀 Installation](#installation)
+- [💰 Pricing & Licensing](#pricing--licensing)
 - [🏆 Superiority Validation](#superiority-validation)
 - [🔍 Enhanced Tool Suite](#enhanced-tool-suite)
 - [💼 Business Intelligence](#business-intelligence-unique)
@@ -109,6 +110,44 @@ npm run demo            # Shows example usage command
 ```bash
 docker run -e OPENROUTER_API_KEY=your-key emmron/gemini-mcp
 ```
+
+---
+
+## 💰 Pricing & Licensing
+
+**Professional AI Tools with Flexible Pricing**
+
+| Tier | Price | Tools | Daily Calls | Best For |
+|------|-------|-------|-------------|----------|
+| **🆓 Free** | $0 | 4 essential | 50 | Learning & evaluation |
+| **⚡ Trial** | $0 (14 days) | ALL 27 tools | 100 | Try before you buy |
+| **🚀 Pro** | $49/mo | 23 advanced | 1,000 | Professional developers |
+| **🏢 Enterprise** | $499/mo | ALL 27 tools | Unlimited | Teams & organizations |
+
+### 🎯 Quick Start
+
+**Free Tier** - Start immediately (no license required):
+```bash
+npm install
+npm start
+# Use 4 essential tools with 50 calls/day
+```
+
+**Pro/Enterprise** - Activate your license:
+```bash
+export GEMINI_MCP_LICENSE="your-license-key-here"
+npm start
+```
+
+**14-Day Trial** - Try all features free:
+```bash
+# Start trial via MCP tool:
+mcp__gemini__start_trial --email your@email.com
+```
+
+📖 **[View Full Pricing Details →](PRICING.md)**
+🎁 **[Start Free Trial →](https://gemini-mcp.com/trial)**
+💳 **[Purchase License →](https://gemini-mcp.com/pricing)**
 
 ---
 
