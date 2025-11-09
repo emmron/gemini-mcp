@@ -20,7 +20,11 @@
     "demo": "echo '🎯 Demo: mcp__gemini__ai_chat --message \"Help me with code\" --model coding'",
     "install:claude": "echo '🚀 Add to Claude: claude add mcp gemini node $(pwd)/src/server.js'",
     "clean": "rm -rf .taskmaster/ && echo 'Cleaned task storage'",
-    "health": "node -e \"import('./src/utils/performance.js').then(m=>console.log(JSON.stringify(m.performanceMonitor.getSystemHealth(),null,2)))\""
+    "health": "node -e \"import('./src/utils/performance.js').then(m=>console.log(JSON.stringify(m.performanceMonitor.getSystemHealth(),null,2)))\"",
+    "license:generate": "node scripts/generate-license.js",
+    "license:info": "NODE_ENV=test node -e \"import('./src/utils/license.js').then(m=>console.log(JSON.stringify(m.licenseManager.getLicenseInfo(),null,2)))\"",
+    "license:activate": "node -e \"import('./src/utils/license.js').then(m=>{const key=process.argv[1];m.licenseManager.activateLicense(key).then(r=>console.log('✅ License activated:',r.license.tier))})\"",
+    "pricing": "cat PRICING.md"
   },
   "keywords": [
     "mcp",

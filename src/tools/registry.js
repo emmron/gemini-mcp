@@ -6,6 +6,7 @@ import { codeTools } from './code-tools.js';
 import { analysisTools } from './analysis-tools.js';
 import { enhancedTools } from './enhanced-tools.js';
 import { businessTools } from './business-tools.js';
+import { licenseTools } from './license-tools.js';
 
 class ToolRegistry {
   constructor() {
@@ -235,7 +236,8 @@ Create a structured task list with:
     this.registerToolsFromModule(analysisTools);
     this.registerToolsFromModule(enhancedTools);
     this.registerToolsFromModule(businessTools);
-    
+    this.registerToolsFromModule(licenseTools);
+
     logger.info('Tool registry initialized', { toolCount: this.tools.size });
   }
 
